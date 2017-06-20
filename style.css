@@ -1,0 +1,59 @@
+/* Leaf green: rgb(55, 91, 46)
+
+*/
+
+body {
+   margin: 0px;
+   display: flex;
+   justify-content: center;
+   margin-top: 50px;
+}
+
+.side-divs {
+   border: 1px solid rgb(55, 91, 46);
+}
+
+canvas {
+   border: 1px solid black;
+}
+
+.menu-screen {
+   position: absolute;
+   height: 200px;
+   width: 250px;
+   margin-top: 100px;
+   background-color: gray;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+}
+
+#start-screen {
+   display: flex;
+}
+
+#start-button {
+   background-color: black;
+   color: white;
+}
+
+#start-button:hover {
+   cursor: pointer;
+}
+
+#game-over-screen {
+   display: none;  
+}
+
+p {
+   margin: 5px;
+}
+
+i {
+   margin-top: 5px;
+   font-size: 30px;
+}
+
+i:hover {
+   color: white;
+}

@@ -1,7 +1,6 @@
 var express = require('express');
 var app = express();
 var path = require('path');
-var sass = require('node-sass');
 
 app.use(express.static(path.join(__dirname, '')));
 

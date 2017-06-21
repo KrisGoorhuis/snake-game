@@ -230,6 +230,14 @@ $(document).ready(function() {
             if (foodPositions.length === 0) {
                generateFood();
             }
+            
+            if (highScore < foodEaten) {
+               highScore = foodEaten;
+               $('#high-score-value').text(highScore);
+               $('#game-over-text').text("New high score!");
+            } else {
+               $('#game-over-text').text("Game over");
+            }
          }
       }
    }
@@ -241,14 +249,8 @@ $(document).ready(function() {
       clearInterval(redrawInterval);
       clearInterval(foodInterval);
       
-      if (highScore < foodEaten) {
-         highScore = foodEaten;
-         $('#high-score-text').text("New high score!");
-      } else {
-         $('#high-score-text').text("High score:");
-      }
       
-      $('#high-score-value').text(highScore);
+      
       $('#game-over-screen').css('display', 'flex');
    }
    

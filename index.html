@@ -9,28 +9,25 @@
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
    <script src="app.js"></script>
    <script src="https://use.fontawesome.com/dfbeabcf83.js"></script>
+   <link href="https://fonts.googleapis.com/css?family=Pangolin" rel="stylesheet">
 </head>
    
    
    
 <body>
    <div class="side-divs">
-      <p>Food bits:</p>
-      <p id="food-eaten"></p>
-   
+      <p>Food bits: <span id="food-eaten">0</span></p>
+      <p id="high-score-text">High score: <span id="high-score-value">0</span></p>   
    </div>
    <canvas id="myCanvas"></canvas>
    <div class="side-divs"></div>
    
    <div class="menu-screen" id="game-over-screen">
-      <p>Game over</p>
-      <p id="high-score-text"></p>
-      <p id="high-score-value"></p>
-      <p>Try again?</p>
-      <i class="fa fa-refresh" aria-hidden="true" id="reset-button"></i>
+      <h2 id="game-over-text">Game over</h2>
+      <p id="reset-button">Try again?</p>
    </div>
    <div class="menu-screen" id="start-screen">
-      <p>Ready?</p>
+      <h2>Ready?</h2>
       <p id="start-button">Start!</p>
    </div>
    

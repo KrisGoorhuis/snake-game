@@ -1,4 +1,4 @@
-/*global $ document window localStorage */
+/*jshint browser: true */
 
 $(document).ready(function() {
    
@@ -22,6 +22,14 @@ $(document).ready(function() {
    
    var bodyPositions = [];
    var foodPositions = [];
+   var obstaclePositions = [];
+   
+   // Plus one dotRadius, then stick to multiples of dot circumference
+   var obstacleEndpoints = [1, 2
+      //[[20, 20][164, 4]]
+   ];
+   
+   
    
    var snakeLengthDefault = 5;
    var snakeLength = snakeLengthDefault;
@@ -37,6 +45,10 @@ $(document).ready(function() {
    
    var foodEaten = 0;
    var highScore = 0;   
+   
+   sessionStorage.test = "Session storage! Woo!";
+   
+   console.log(sessionStorage.test);
    
    
    function startPlaying() {
@@ -138,16 +150,15 @@ $(document).ready(function() {
       }
    }
    
-   function generateFood() {
-      
+   function generateFood() { 
       // Complicated (for me) stuff that keeps new food pellets spawning on a nice grid. I like to think they're berries.
       function acquireNewCoordinate(widthOrHeight) {
          var dotCircumference = dotRadius*2;
-         var dotsInsideWidth = (widthOrHeight/dotCircumference) - 1; 
+         var dotsInsideCanvasWidth = (widthOrHeight/dotCircumference) - 1; 
             // We're dividing by dot size to get numbers that are always multiples of our circumference. We'll multiply later to get numbers usable with our actual canvas width/height.
             // Subtracting because Left edge of the final circle would otherwise lie on the canvas' right side border. We're playing inside the field.
         
-         var randomNonInteger = Math.random() * (dotsInsideWidth - 1) + 1;
+         var randomNonInteger = Math.random() * (dotsInsideCanvasWidth - 1) + 1;
          var randomInteger = Math.floor(randomNonInteger) + 1; 
          var newFoodCoordinate = (randomInteger * dotCircumference) + dotRadius; 
             // Multiplying to get our neatly grid-based random number.
@@ -160,6 +171,7 @@ $(document).ready(function() {
       var newFoodY = acquireNewCoordinate(canvasHeight);
       
       foodPositions.push([newFoodX, newFoodY]);
+      console.log([newFoodX, newFoodY]);
    }
    
    function drawFood() {
@@ -210,8 +222,72 @@ $(document).ready(function() {
          segmentCount++;
          context.fill();
          context.closePath();      
-      }; 
-   };
+      } 
+   }
+   
+   function constructObstacles(obstacleEndpoints) {         
+      // Relies on coordinates that fit the grid.
+      // Start points must be (multiples of dot circumference) + dot radius
+      for (i = 0; i < obstacleEndpoints.length; i++) {
+         var originX = obstacleEndpoints[i][0][0];
+         var destinationX = obstacleEndpoints[i][1][0];
+         var originY = obstacleEndpoints[i][0][1];
+         var destinationY = obstacleEndpoints[i][1][1];
+         var newCoordinateX;
+         var newCoordinateY;
+         var newCoordinate;
+         
+         if (originX < destinationX) { 
+            newCoordinateX = originX;
+            newCoordinateY = originY;
+            for (i = originX; i < destinationX; i += dotRadius*2) {
+               newCoordinateX += dotRadius*2;  
+               newCoordinate = [newCoordinateX, newCoordinateY];
+               obstaclePositions.push(newCoordinate);
+            }  
+         }
+         if (originX > destinationX) {
+            newCoordinateX = originX;
+            newCoordinateY = originY;
+            for (i = originX; i < destinationX; i += dotRadius*2) {
+               newCoordinateX -= dotRadius*2;  
+               newCoordinate = [newCoordinateX, newCoordinateY];
+               obstaclePositions.push(newCoordinate);
+            }  
+         }
+         if (originY < destinationY) {
+            newCoordinateX = originX;
+            newCoordinateY = originY;
+            for (i = originY; i < destinationY; i += dotRadius*2) {
+               newCoordinateY += dotRadius*2;
+               newCoordinate = [newCoordinateX, newCoordinateY];
+               obstaclePositions.push(newCoordinate);
+            }
+            console.log(obstacleEndpoints);
+         }
+         if (originY > destinationY) {
+            newCoordinateX = originX;
+            newCoordinateY = originY;
+            for (i = originY; i < destinationY; i += dotRadius*2) {
+               newCoordinateY -= dotRadius*2;
+               newCoordinate = [newCoordinateX, newCoordinateY];
+               obstaclePositions.push(newCoordinate);
+            }
+         }
+      } 
+   }
+   
+   function drawObstacles() {
+      for (i = 0; i < obstaclePositions.length; i++) {
+         var squareX = obstaclePositions[i][0] - dotRadius;
+         var squareY = obstaclePositions[i][1] - dotRadius;
+         
+         context.beginPath();
+         context.rect(squareX, squareY, dotRadius*2, dotRadius*2);
+         context.stroke();
+         context.closePath();     
+      }
+   }
    
    function foodCheck() {
       // indexOf tracks instances of the specific item in question. So [300, 300] can return -1 even with the presence of [300, 300] in the array of arrays.
@@ -247,10 +323,8 @@ $(document).ready(function() {
       currentScreen = "game over";
       snakeLength = snakeLengthDefault;
       clearInterval(redrawInterval);
-      clearInterval(foodInterval);
-      
-      
-      
+      clearInterval(foodInterval); 
+      console.log(obstaclePositions);
       $('#game-over-screen').css('display', 'flex');
    }
    
@@ -270,24 +344,37 @@ $(document).ready(function() {
             gameOver();
          }
       }
+      
+      for (i = 0; i < obstaclePositions.length; i++) {
+         if (obstaclePositions[i][0] === x && obstaclePositions[i][1] === y) {
+            clearInterval(redrawInterval);
+            gameOver();
+         }
+      }
    }
 
    function drawCycle() {
       deathCheck();
       if (dead === false) {
          context.clearRect(0, 0, canvas.width, canvas.height);
+         drawObstacles();
          drawFood();
-         drawSnake();
-         foodCheck();
+         drawSnake();      
+         foodCheck();  
       } 
       incrementPosition();
    }
    
-   
    $('#start-button').on("click", startPlaying);
-   
    $('#reset-button').on("click", resetPlay);
    
    document.addEventListener("keydown", keyDownHandler);
+   
+   
+   constructObstacles([
+            [ [164, 220], [164, 340] ]
+         ]); 
+   
+   drawCycle();
 });
 

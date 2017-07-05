@@ -11,11 +11,27 @@ body {
 }
 
 .side-divs {
-   width: 100px;
+   width: 150px;
    margin: 1px;
    padding-top: 10px;
    text-align: right;
    color: rgb(55, 91, 46);
+}
+
+.side-divs div {
+   display: flex;
+   justify-content: flex-end;
+   align-items: right;
+}
+
+.side-divs p {
+   margin: 0px;
+}
+
+.score-number {
+   display: flex;
+   justify-content: center;
+   width: 35px;
 }
 
 canvas {
@@ -67,6 +83,34 @@ canvas {
 #start-button:hover {
    cursor: pointer;
    background-color: rgb(149, 166, 201);
+}
+
+h6 {
+   font-size: 12px;
+   margin: 0px;
+   margin-top: 20px;
+}
+
+ul {
+   padding: 0px;
+   margin: 0px;
+   display: flex; 
+   justify-content: flex-start;
+   align-items: center;
+}
+
+li {
+   list-style-type: none;
+   font-size: 12px;
+   display: flex;
+   align-items: center;
+   margin: 3px;
+   border-bottom: 1px solid rgb(55, 91, 46);
+}
+
+li:hover {
+   border-bottom: 1px solid white;
+   cursor: pointer;
 }
 
 #game-over-screen {

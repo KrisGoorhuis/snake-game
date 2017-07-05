@@ -16,19 +16,40 @@
    
 <body>
    <div class="side-divs">
-      <p>Food bits: <span id="food-eaten">0</span></p>
-      <p id="high-score-text">High score: <span id="high-score-value">0</span></p>   
+      <div>
+         <p>Food bits: </p>
+         <p class="score-number" id="food-eaten">0</p>
+      </div>
+      <div>
+         <p id="high-score-text">High score: </p>
+         <p class="score-number" id="high-score-value">0</p>   
+      </div>
    </div>
    <canvas id="myCanvas"></canvas>
    <div class="side-divs"></div>
    
-   <div class="menu-screen" id="game-over-screen">
-      <h2 id="game-over-text">Game over</h2>
-      <p id="reset-button">Try again?</p>
-   </div>
    <div class="menu-screen" id="start-screen">
       <h2>Ready?</h2>
       <p id="start-button">Start!</p>
+      <h6>Choose a level:</h6>
+      <ul>
+         <li class="level-zero">Plain</li>
+         <li class="level-one">Brackets</li>
+         <li class="level-two">Boxy</li>
+         <li class="level-three">Floors</li>
+      </ul>
+   </div>
+   
+   <div class="menu-screen" id="game-over-screen">
+      <h2 id="game-over-text">Game over</h2>
+      <p id="reset-button">Play again?</p>
+      <h6>Choose a level:</h6>
+      <ul>
+         <li class="level-zero">Plain</li>
+         <li class="level-one">Brackets</li>
+         <li class="level-two">Boxy</li>
+         <li class="level-three">Floors</li>
+      </ul>
    </div>
    
 </body>

@@ -2,6 +2,7 @@
     "globals": {
         "$": true,
        "i": true,
+       "j": true,
        "console": true
     }
 }

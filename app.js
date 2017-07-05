@@ -37,13 +37,14 @@ $(document).ready(function() {
    var dead = false;
    var movementDirection = "up";
    var currentScreen = "start";
+   var selectedLevel = 0;
    
    var x = canvas.width/2;
    var y = canvas.height/2+dotRadius*2;
    var dx = dotRadius*2;
    var dy = dotRadius*2;
    
-   var foodEaten = 0;
+   var foodEaten = 10;
    var highScore = 0;   
    
    sessionStorage.test = "Session storage! Woo!";
@@ -54,6 +55,8 @@ $(document).ready(function() {
    function startPlaying() {
       $('#start-screen').css("display", "none");
       currentScreen = "playing";
+      
+      loadLevel();
       
       generateFood();
       foodInterval = setInterval(generateFood, foodIntervalTime);
@@ -80,11 +83,14 @@ $(document).ready(function() {
       dx = dotRadius*2;
       dy = dotRadius*2;
       
+      loadLevel();
+      
       generateFood();
       foodInterval = setInterval(generateFood, foodIntervalTime);
    
       drawCycle();
       redrawInterval = setInterval(drawCycle, redrawIntervalTime);
+      console.log("Setting interval to " + redrawIntervalTime);
    }
    
    function keyDownHandler(event) {
@@ -100,25 +106,25 @@ $(document).ready(function() {
          }
       }
       
-      if (event.keyCode === 38 && movementDirection !== "up" && movementDirection !== "down") { 
+      if (currentScreen === "playing" && event.keyCode === 38 && movementDirection !== "up" && movementDirection !== "down") { 
          movementDirection = "up";
          drawCycle(); 
          clearInterval(redrawInterval);
          redrawInterval = setInterval(drawCycle, redrawIntervalTime);
       }
-      if (event.keyCode === 40 && movementDirection !== "down" && movementDirection !== "up") { 
+      if (currentScreen === "playing" && event.keyCode === 40 && movementDirection !== "down" && movementDirection !== "up") { 
          movementDirection = "down";
          drawCycle();
          clearInterval(redrawInterval);
          redrawInterval = setInterval(drawCycle, redrawIntervalTime);
       }
-      if (event.keyCode === 37 && movementDirection !== "left" && movementDirection !== "right") { 
+      if (currentScreen === "playing" && event.keyCode === 37 && movementDirection !== "left" && movementDirection !== "right") { 
          movementDirection = "left";
          drawCycle();
          clearInterval(redrawInterval);
          redrawInterval = setInterval(drawCycle, redrawIntervalTime);
       } 
-      if (event.keyCode === 39 && movementDirection !== "right" && movementDirection !== "left") { 
+      if (currentScreen === "playing" && event.keyCode === 39 && movementDirection !== "right" && movementDirection !== "left") { 
          movementDirection = "right";
          drawCycle();
          clearInterval(redrawInterval);
@@ -170,8 +176,23 @@ $(document).ready(function() {
       var newFoodX = acquireNewCoordinate(canvasWidth);
       var newFoodY = acquireNewCoordinate(canvasHeight);
       
-      foodPositions.push([newFoodX, newFoodY]);
-      console.log([newFoodX, newFoodY]);
+      var overlap;
+      for (i = 0; i < obstaclePositions.length; i++) { 
+         if (obstaclePositions[i][0] === newFoodX && obstaclePositions[i][1] === newFoodY) {
+            overlap = true;
+            break;
+         } else {
+            overlap = false;
+         }
+      }
+      
+      if (overlap) {
+         generateFood();
+      } else {
+         foodPositions.push([newFoodX, newFoodY]);
+      }
+      
+      
    }
    
    function drawFood() {
@@ -240,7 +261,7 @@ $(document).ready(function() {
          if (originX < destinationX) { 
             newCoordinateX = originX;
             newCoordinateY = originY;
-            for (i = originX; i < destinationX; i += dotRadius*2) {
+            for (j = originX; j < destinationX; j += dotRadius*2) {
                newCoordinateX += dotRadius*2;  
                newCoordinate = [newCoordinateX, newCoordinateY];
                obstaclePositions.push(newCoordinate);
@@ -249,7 +270,7 @@ $(document).ready(function() {
          if (originX > destinationX) {
             newCoordinateX = originX;
             newCoordinateY = originY;
-            for (i = originX; i < destinationX; i += dotRadius*2) {
+            for (j = originX; j < destinationX; j += dotRadius*2) {
                newCoordinateX -= dotRadius*2;  
                newCoordinate = [newCoordinateX, newCoordinateY];
                obstaclePositions.push(newCoordinate);
@@ -258,17 +279,16 @@ $(document).ready(function() {
          if (originY < destinationY) {
             newCoordinateX = originX;
             newCoordinateY = originY;
-            for (i = originY; i < destinationY; i += dotRadius*2) {
+            for (j = originY; j < destinationY; j += dotRadius*2) {
                newCoordinateY += dotRadius*2;
                newCoordinate = [newCoordinateX, newCoordinateY];
                obstaclePositions.push(newCoordinate);
             }
-            console.log(obstacleEndpoints);
          }
          if (originY > destinationY) {
             newCoordinateX = originX;
             newCoordinateY = originY;
-            for (i = originY; i < destinationY; i += dotRadius*2) {
+            for (j = originY; j < destinationY; j += dotRadius*2) {
                newCoordinateY -= dotRadius*2;
                newCoordinate = [newCoordinateX, newCoordinateY];
                obstaclePositions.push(newCoordinate);
@@ -284,10 +304,65 @@ $(document).ready(function() {
          
          context.beginPath();
          context.rect(squareX, squareY, dotRadius*2, dotRadius*2);
-         context.stroke();
+         context.fillStyle = "#b87730";
+         context.fill();
          context.closePath();     
       }
    }
+   
+   function loadLevel() {
+      obstaclePositions = [];
+      switch(selectedLevel) {
+         case 0:
+            constructObstacles([
+               // Blank!
+            ]);
+            break;
+            
+         case 1:
+            constructObstacles([
+               [ [52, 140], [52, 204] ], // left vertical
+               [ [52, 204], [176, 204] ], // left horizontal
+               [ [356, 204], [356, 260] ], // right vertical
+               [ [220, 204], [356, 204] ] // right horizontal
+            ]);
+            break;   
+            
+         case 2: // "Walled Garden"
+            var gaps = (dotRadius*2)*3;
+            constructObstacles([
+               [ [76, 76+gaps], [76, 324-gaps] ], // left
+               [ [76+gaps, 76], [324-gaps, 76] ], // top
+               [ [324, 76+gaps], [324, 324-gaps] ], //right
+               [ [76+gaps, 324], [324-gaps, 324] ] // bottom
+            ]); 
+            break;
+            
+         case 3:
+            constructObstacles([
+               
+               [ [36, 44+(8*0) ],  [184, 44+(8*0)] ], // left set
+               [ [36, 44+(8*8) ],  [184, 44+(8*8)] ],
+               [ [36, 44+(8*16)], [184, 44+(8*16)] ],
+               [ [36, 44+(8*24)], [184, 44+(8*24)] ],
+               [ [36, 44+(8*32)], [184, 44+(8*32)] ],
+               [ [36, 44+(8*40)], [184, 44+(8*40)] ],
+               
+               [ [220, 44+(8*0) ],  [364, 44+(8*0)] ], // right set
+               [ [220, 44+(8*8) ],  [364, 44+(8*8)] ],
+               [ [220, 44+(8*16)], [364, 44+(8*16)] ],
+               [ [220, 44+(8*24)], [364, 44+(8*24)] ],
+               [ [220, 44+(8*32)], [364, 44+(8*32)] ],
+               [ [220, 44+(8*40)], [364, 44+(8*40)] ]     
+            ]);
+            break;
+      }
+   }
+   
+   function loadLevelTwo() {
+      
+   }
+   
    
    function foodCheck() {
       // indexOf tracks instances of the specific item in question. So [300, 300] can return -1 even with the presence of [300, 300] in the array of arrays.
@@ -324,7 +399,6 @@ $(document).ready(function() {
       snakeLength = snakeLengthDefault;
       clearInterval(redrawInterval);
       clearInterval(foodInterval); 
-      console.log(obstaclePositions);
       $('#game-over-screen').css('display', 'flex');
    }
    
@@ -368,12 +442,35 @@ $(document).ready(function() {
    $('#start-button').on("click", startPlaying);
    $('#reset-button').on("click", resetPlay);
    
+   $('li').css("color", "white");
+   $('.level-zero').css("color", "rgb(129, 146, 191)");
+   
+   $('.level-zero').on("click", function() {
+      selectedLevel = 0;
+      $('li').css("color", "white");
+      $('.level-zero').css("color", "rgb(129, 146, 191)");
+   });
+   $('.level-one').on("click", function() {
+      selectedLevel = 1;
+      $('li').css("color", "white");
+      $('.level-one').css("color", "rgb(129, 146, 191)");
+   });
+    $('.level-two').on("click", function() {
+      selectedLevel = 2;
+      $('li').css("color", "white");
+      $('.level-two').css("color", "rgb(129, 146, 191)");
+   });
+   $('.level-three').on("click", function() {
+      selectedLevel = 3;
+      $('li').css("color", "white");
+      $('.level-three').css("color", "rgb(129, 146, 191)");
+   });
+   
    document.addEventListener("keydown", keyDownHandler);
    
+   // Relies on coordinates that fit the grid.
+   // Start points must be (multiples of dot circumference) + dot radius
    
-   constructObstacles([
-            [ [164, 220], [164, 340] ]
-         ]); 
    
    drawCycle();
 });

@@ -23,12 +23,7 @@ $(document).ready(function() {
    var bodyPositions = [];
    var foodPositions = [];
    var obstaclePositions = [];
-   
-   // Plus one dotRadius, then stick to multiples of dot circumference
-   var obstacleEndpoints = [1, 2
-      //[[20, 20][164, 4]]
-   ];
-   
+   var obstacleEndpoints = [];
    
    
    var snakeLengthDefault = 5;
@@ -44,7 +39,7 @@ $(document).ready(function() {
    var dx = dotRadius*2;
    var dy = dotRadius*2;
    
-   var foodEaten = 10;
+   var foodEaten = 0;
    var highScore = 0;   
    
    sessionStorage.test = "Session storage! Woo!";
@@ -310,6 +305,8 @@ $(document).ready(function() {
       }
    }
    
+   // Relies on coordinates that fit the grid.
+   // Start points must be (multiples of dot circumference) + dot radius
    function loadLevel() {
       obstaclePositions = [];
       switch(selectedLevel) {
@@ -365,7 +362,7 @@ $(document).ready(function() {
    
    
    function foodCheck() {
-      // indexOf tracks instances of the specific item in question. So [300, 300] can return -1 even with the presence of [300, 300] in the array of arrays.
+      // indexOf tracks instances of the specific copy of an item in question. So [300, 300] can return -1 even with the presence of [300, 300] in the array of arrays - it's a different instance of the thing.
       for (i = 0; i < foodPositions.length; i++) {
          if (foodPositions[i][0] === x && foodPositions[i][1] === y) {
             snakeLength+= snakeGrowth; 
@@ -467,10 +464,6 @@ $(document).ready(function() {
    });
    
    document.addEventListener("keydown", keyDownHandler);
-   
-   // Relies on coordinates that fit the grid.
-   // Start points must be (multiples of dot circumference) + dot radius
-   
    
    drawCycle();
 });
